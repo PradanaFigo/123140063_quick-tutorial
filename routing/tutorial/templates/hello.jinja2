@@ -1,0 +1,7 @@
+{# Beri tahu Jinja2 untuk menggunakan 'layout.jinja2' sebagai dasarnya #}
+{% extends "tutorial:templates/layout.jinja2" %}
+
+{# Definisikan konten untuk 'block content' yang ada di layout #}
+{% block content %}
+<h1>Hello {{ name }}! Welcome to the {{ project }}!</h1>
+{% endblock %}

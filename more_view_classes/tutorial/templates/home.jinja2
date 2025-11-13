@@ -1,0 +1,34 @@
+{% extends "tutorial:templates/layout.jinja2" %}
+
+{% block content %}
+{# <h1> akan diisi oleh AJAX atau oleh 'project' dari POST #}
+<h1>Hello {{ name }}! Welcome to the {{ project }}!</h1>
+
+{# ↓↓↓ TAMBAHKAN FORM INI ↓↓↓ #}
+<form method="POST"
+      action="{{ request.route_url('home') }}">
+    <label>Ganti Nama Proyek:</label>
+    <input type="text" name="project" value="{{ project }}">
+    <input type="submit" value="Simpan">
+</form>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    
+    // 1. Minta data JSON dari '/home.json' (URL BARU)
+    $.getJSON('{{ request.route_url("home_json") }}', function(data) {
+        
+        // 2. Jika berhasil, ambil data 'name' dan 'project'
+        var name = data.name;
+        var project = data.project;
+        
+        // 3. Temukan <h1> dan ganti HTML-nya
+        $('h1').html('Hello ' + name + '! Welcome to the ' + project + '!');
+    });
+});
+</script>
+{% endblock %}

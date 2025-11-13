@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pyramid Quick Tutorial</title>
+    
+    <link rel="stylesheet"
+          href="{{ request.static_url('tutorial:static/app.css') }}">
+          
+    {# ↓↓↓ TAMBAHKAN JQUERY DI SINI ↓↓↓ #}
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+          
+</head>
+<body>
+    {# 'block content' akan diisi oleh hello_world.jinja2 #}
+    {% block content %}
+    {% endblock %}
+    
+    {# 'block scripts' adalah blok baru untuk skrip kita #}
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% extends "tutorial:templates/layout.jinja2" %}
+
+{% block content %}
+{# Judul h1 ini awalnya 'Hello Pyramid!' #}
+<h1>Hello {{ name }}! Welcome to the {{ project }}!</h1>
+{% endblock %}
+
+
+{# ↓↓↓ TAMBAHKAN BLOK SKRIP INI ↓↓↓ #}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Jalankan kode ini saat halaman selesai dimuat
+    
+    // 1. Minta data JSON dari '/hello.json'
+    $.getJSON('/hello.json', function(data) {
+        
+        // 2. Jika berhasil, ambil data 'name' dan 'project'
+        var name = data.name;
+        var project = data.project;
+        
+        // 3. Temukan <h1> dan ganti HTML-nya
+        $('h1').html('Hello ' + name + '! Welcome to the ' + project + '!');
+    });
+});
+</script>
+{% endblock %}

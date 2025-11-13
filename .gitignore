@@ -1,0 +1,9 @@
+# Virtual Environments
+venv/
+
+# Python build artifacts
+*.egg-info/
+__pycache__/
+
+# Database
+*.sqlite

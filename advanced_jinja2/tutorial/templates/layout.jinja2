@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pyramid Quick Tutorial</title>
+    <link rel="stylesheet"
+          href="{{ request.static_url('tutorial:static/app.css') }}">
+</head>
+<body>
+    {% block content %}
+    {% endblock %}
+
+    <hr>
+    
+    {# -------------------------------------------------------- #}
+    {# ↓↓↓ PERBAIKAN: Gunakan 'request.route_url' ↓↓↓ #}
+    {# -------------------------------------------------------- #}
+    <p>Navigasi:</p>
+    <ul>
+        <li><a href="{{ request.route_url('home') }}">Home</a></li>
+        <li><a href="{{ request.route_url('hello', name='Pyramid') }}">Hello</a></li>
+    </ul>
+
+</body>
+</html>
