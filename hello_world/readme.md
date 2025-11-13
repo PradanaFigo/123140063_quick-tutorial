@@ -1,64 +1,110 @@
-# Proyek Hello World Pyramid
+# Proyek Pyramid (Langkah 6: Functional Testing)
 
-Ini adalah aplikasi web "Hello World" minimalis yang dibuat menggunakan [Pyramid Web Framework](https://trypyramid.com/).
+Ini adalah langkah keenam dalam tutorial Pyramid. Kita akan menambahkan **Pengujian Fungsional** (Functional Testing). Berbeda dengan *Unit Test* (Langkah 5) yang menguji fungsi `app()` secara terisolasi, *Functional Test* akan menguji seluruh tumpukan aplikasi, termasuk *entry point* `main()` dan file konfigurasi `.ini`.
 
-Proyek ini didasarkan pada [Quick Tutorial: Hello World](https://docs.pylonsproject.org/projects/pyramid/en/latest/quick_tutorial/hello_world.html) dari dokumentasi resmi Pyramid.
+Proyek ini didasarkan pada [Quick Tutorial: Functional Testing](https://docs.pylonsproject.org/projects/pyramid/en/latest/quick_tutorial/functional_testing.html) dari dokumentasi resmi Pyramid.
 
 ## Tujuan
 
-Tujuan dari proyek ini adalah untuk menunjukkan cara paling sederhana membuat aplikasi web Pyramid yang berfungsi hanya dengan satu file Python dan server WSGI `waitress`.
+Tujuan dari proyek ini adalah untuk membuat tes yang mensimulasikan pemanggilan aplikasi secara penuh, persis seperti yang dilakukan server `pserve`. Ini memvalidasi bahwa semua bagian (entry point, konfigurasi, dan kode aplikasi) bekerja sama dengan benar.
 
 ## Persyaratan
-
 * Python 3.6+
-* `pip` (manajer paket Python)
+* `pip` dan `venv` (biasanya sudah termasuk dalam Python)
 
 ## Instalasi
-
-1.  **Buat Direktori Proyek:**
-    Buat direktori untuk proyek Anda (misalnya: `D:\Figo\projects\quick_tutorial\hello_world`) dan buat file `app.py` di dalamnya.
-
-2.  **Instal Dependensi:**
-    Proyek ini memerlukan `pyramid` dan `waitress`. Karena Anda tidak menggunakan venv, paket-paket ini akan diinstal secara global.
-
-    Buat file `requirements.txt` dengan isi berikut:
-
-    ```text
-    pyramid
-    waitress
-    ```
-
-    Lalu instal menggunakan pip:
+1.  **Persiapan Proyek (Salin dari Langkah 5):**
+    Pertama, salin seluruh proyek `testing` Anda ke folder baru bernama `functional_testing`.
     ```bash
-    pip install -r requirements.txt
+    # Pastikan Anda di D:\Figo\projects\quick_tutorial
+    cd D:\Figo\projects\quick_tutorial
+    
+    # Salin 'testing' ke 'functional_testing'
+    Copy-Item -Path testing -Destination functional_testing -Recurse
     ```
-    *Atau, instal secara manual:*
+    *Tidak ada perubahan pada `setup.py` atau `tutorial/app.py` di langkah ini.*
+
+2.  **Buat Ulang dan Aktifkan Virtual Environment (PENTING):**
+    `venv` tidak bisa disalin. Anda harus membuatnya ulang di dalam folder `functional_testing`.
     ```bash
-    pip install pyramid waitress
+    # Pindah ke direktori 'functional_testing' yang baru
+    cd D:\Figo\projects\quick_tutorial\functional_testing
+    
+    # HAPUS venv lama yang rusak (PENTING)
+    Remove-Item -Path venv -Recurse -Force
+    
+    # Buat venv baru yang bersih
+    python -m venv venv
+    
+    # Aktifkan venv (Windows PowerShell)
+    .\venv\Scripts\Activate.ps1
     ```
 
-## Menjalankan Aplikasi
-
-1.  Buka terminal (PowerShell atau Command Prompt) dan pindah ke direktori proyek Anda:
-    ```powershell
-    cd D:\Figo\projects\quick_tutorial\hello_world
+3.  **Instal Proyek dan Dependensi (Termasuk Testing):**
+    Perintah ini sama seperti di Langkah 5. Ini akan menginstal semua dependensi dari `setup.py` (termasuk `pytest` dan `webtest`).
+    ```bash
+    # Pastikan (venv) aktif
+    pip install -e ".[dev,testing]"
     ```
 
-2.  Jalankan server:
-    ```powershell
-    python app.py
-    ```
+## Kode Tes Fungsional Baru
 
-3.  Server akan berjalan di `http://0.0.0.0:6543`.
+Anda tidak mengubah file lama. Anda hanya **membuat satu file baru** di dalam `tutorial/tests/`.
 
-## Cara Mengakses
+**File Baru:** `tutorial/tests/test_functional.py`
+```powershell
+New-Item tutorial\tests\test_functional.py
 
-Buka browser web Anda dan kunjungi alamat berikut:
+Buka file baru tersebut dan tempelkan kode ini ke dalamnya:
 
-[**http://localhost:6543/**](http://localhost:6543/)
+Python
 
-Anda akan melihat pesan `Hello World!` di browser.
+import unittest
+from webtest import TestApp
 
-## Menghentikan Server
+class FunctionalTests(unittest.TestCase):
+    def setUp(self):
+        # Impor fungsi 'main' dari app.py
+        from tutorial.app import main
+        
+        # Siapkan pengaturan untuk file .ini
+        # Kita gunakan 'development.ini' sebagai dasar
+        # dan menimpa 'pyramid.includes' agar tidak memuat toolbar
+        settings = {
+            'pyramid.includes': [], # Kosongkan agar tidak ada debugtoolbar
+        }
+        
+        # Buat aplikasi WSGI menggunakan 'main' (entry point)
+        # dan pengaturan .ini kita
+        app = main({}, **settings)
+        
+        # Buat 'TestApp' yang membungkus aplikasi WSGI kita
+        self.testapp = TestApp(app)
 
-Untuk menghentikan server, kembali ke terminal tempat Anda menjalankan `python app.py` dan tekan **Ctrl+C**.
+    def test_hello_world(self):
+        # Lakukan permintaan GET ke rute '/'
+        res = self.testapp.get('/', status=200)
+        
+        # Periksa apakah bodinya mengandung 'Hello World!'
+        self.assertIn(b'<h1>Hello World!</h1>', res.body)
+Menjalankan Tes
+Pastikan virtual environment Anda aktif (prompt diawali dengan (venv)) dan Anda berada di D:\Figo\projects\quick_tutorial\functional_testing.
+
+Jalankan pytest:
+
+PowerShell
+
+python -m pytest
+Hasil yang Diharapkan
+Kali ini, pytest akan menemukan 2 file tes dan menjalankan keduanya. Hasil Anda akan terlihat seperti ini, menunjukkan 2 tes lulus:
+
+============================= test session starts ==============================
+platform win32 -- Python 3.x.x, pytest-x.x.x, ...
+rootdir: D:\Figo\projects\quick_tutorial\functional_testing
+plugins: ...
+collected 2 items
+
+tutorial\tests\test_functional.py .                                     [ 50%]
+tutorial\tests\test_views.py .                                          [100%]
+
+============================== 2 passed ... in ...s ===============================
